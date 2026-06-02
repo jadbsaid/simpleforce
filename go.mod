@@ -1,4 +1,4 @@
-module github.com/simpleforce/simpleforce
+module github.com/jadbsaid/simpleforce
 
 go 1.17
 

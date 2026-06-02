@@ -146,10 +146,10 @@ func (obj *SObject) Create() *SObject {
 
 // Update updates SObject in place. Upon successful, same SObject is returned for chained access.
 // ID is required.
-func (obj *SObject) Update() *SObject {
+func (obj *SObject) Update() (*SObject, error) {
 	if obj.Type() == "" || obj.client() == nil || obj.ID() == "" {
 		// Sanity check.
-		return nil
+		return nil, ErrFailure
 	}
 
 	// Make a copy of the incoming SObject, but skip certain metadata fields as they're not understood by salesforce.
@@ -157,7 +157,7 @@ func (obj *SObject) Update() *SObject {
 	reqData, err := json.Marshal(reqObj)
 	if err != nil {
 		log.Println(logPrefix, "failed to convert sobject to json,", err)
-		return nil
+		return nil, err
 	}
 
 	queryBase := "sobjects/"
@@ -168,11 +168,11 @@ func (obj *SObject) Update() *SObject {
 	respData, err := obj.client().httpRequest(http.MethodPatch, url, bytes.NewReader(reqData))
 	if err != nil {
 		log.Println(logPrefix, "failed to process http request,", err)
-		return nil
+		return nil, err
 	}
 	log.Println(string(respData))
 
-	return obj
+	return obj, nil
 }
 
 // Upsert creates SObject or updates existing SObject in place. Upon successful upsert, same SObject is returned for chained access.
